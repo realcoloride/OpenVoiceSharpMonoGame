@@ -32,7 +32,7 @@ namespace OpenVoiceSharpMonoGame
         }
 
         public Rectangle AvatarRectangle = new();
-        public void Draw(SpriteBatch spriteBatch, int offsetY)
+        public void Draw(SpriteBatch spriteBatch, ref int offsetY)
         {
             if (AvatarTexture == null) return;
 
@@ -61,6 +61,8 @@ namespace OpenVoiceSharpMonoGame
                 new Vector2(x, y), 
                 Microsoft.Xna.Framework.Color.White
             );
+
+            offsetY += (int)(avatarHeight * 1.25f);
         }
 
         public void Dispose()

@@ -273,9 +273,7 @@ namespace OpenVoiceSharpMonoGame
             int offsetY = 0;
             foreach (var profile in Profiles.Values)
             {
-                profile.Draw(SpriteBatch, offsetY);
-
-                offsetY += 18;
+                profile.Draw(SpriteBatch, ref offsetY);
             }
 
             SpriteBatch.End();
