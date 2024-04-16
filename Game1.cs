@@ -184,7 +184,7 @@ namespace OpenVoiceSharpMonoGame
 
         protected override void LoadContent()
         {
-            SpriteBatch = new SpriteBatch(base.GraphicsDevice);
+            SpriteBatch = new SpriteBatch(GraphicsDevice);
             ArialFont = Content.Load<SpriteFont>("Arial");
             base.LoadContent();
         }
