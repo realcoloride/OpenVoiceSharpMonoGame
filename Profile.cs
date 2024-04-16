@@ -68,6 +68,7 @@ namespace OpenVoiceSharpMonoGame
         public void Dispose()
         {
             SoundEffectInstance.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         public Profile(Friend member) {
