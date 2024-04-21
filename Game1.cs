@@ -44,6 +44,7 @@ namespace OpenVoiceSharpMonoGame
 
             GraphicsDeviceManager.PreferredBackBufferWidth = WindowWidth;
             GraphicsDeviceManager.PreferredBackBufferHeight = WindowHeight;
+            //IsFixedTimeStep = false;
             GraphicsDeviceManager.ApplyChanges();
 
             Content.RootDirectory = "Content";
@@ -171,8 +172,8 @@ namespace OpenVoiceSharpMonoGame
                 (byte[] encodedData, int encodedLength) = VoiceChatInterface.SubmitAudioData(pcmData, length);
 
                 // send packet to everyone (P2P)
-                foreach (var member in Lobby?.Members)
-                    SteamNetworking.SendP2PPacket(member.Id, encodedData, encodedLength, 0, P2PSend.Reliable);
+                foreach (SteamId steamId in Profiles.Keys)
+                    SteamNetworking.SendP2PPacket(steamId, encodedData, encodedLength, 0, P2PSend.Reliable);
             };
             MicrophoneRecorder.StartRecording();
 
@@ -191,13 +192,13 @@ namespace OpenVoiceSharpMonoGame
 
         void HandleMessageFrom(SteamId steamid, byte[] data)
         {
-            //if (steamid == SteamClient.SteamId) return;
+            if (steamid == SteamClient.SteamId || !Profiles.ContainsKey(steamid)) return;
 
             // decode data
             (byte[] decodedData, int decodedLength) = VoiceChatInterface.WhenDataReceived(data, data.Length);
 
             // push to sound effect instance buffer
-            GetProfile(steamid).SoundEffectInstance.SubmitBuffer(decodedData, 0, decodedLength);
+            GetProfile(steamid).SoundEffectInstance.SubmitBuffer(decodedData);
         }
 
         protected override void Update(GameTime gameTime)
@@ -217,7 +218,7 @@ namespace OpenVoiceSharpMonoGame
                     await HostOrLeave();
 
                     // cooldown
-                    await Task.Delay(1000);
+                    await Task.Delay(300);
                     BusyCreating = false;
                 });
             }
@@ -236,7 +237,6 @@ namespace OpenVoiceSharpMonoGame
                     BusyTogglingNoiseSuppression = false;
                 });
             }
-
 
             if (Lobby == null) return;
 
@@ -271,10 +271,9 @@ namespace OpenVoiceSharpMonoGame
             DrawString($"Press [F] to {(VoiceChatInterface.EnableNoiseSuppression ? "disable" : "enable")} noise suppression (RNNoise)", ref textPosition);
 
             int offsetY = 0;
+
             foreach (var profile in Profiles.Values)
-            {
                 profile.Draw(SpriteBatch, ref offsetY);
-            }
 
             SpriteBatch.End();
 
